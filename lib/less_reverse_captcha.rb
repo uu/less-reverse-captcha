@@ -36,18 +36,24 @@ module Less
     module Helper
       # Use this helper to create a captcha challenge question
       #
-      #   <%= captcha_field("entry") %>
+      #   <%= less_reverse_captcha_field :entry %>
       #
       # the following HTML will be generated. The hidden field contains an encrypted version of the answer
       #
-      #   <input id="entry_less_value_for_text_input" name="entry[less_value_for_text_input]" size="30" style="display: none;" type="text" />
-      
+      #   <input id="entry_less_value_for_text_input" name="entry[less_value_for_text_input]" size="30" type="text" />
+      #   <script type="text/javascript">
+      #     //<![CDATA[
+      #       e = document.getElementById('entry_less_value_for_text_input'); e.parentNode.removeChild(e);
+      #     //]]>
+      #   </script>
       #
       # You can use the +options+ argument to pass additional options to the text-field tag.
+      # pass :unobtrusive => true if you want to hide the field in an unobtrusive way. 
       def less_reverse_captcha_field(object, options={})
-        style = options.delete(:style) || ''
-        style = style.blank? ? "display: none;" : "#{style}; display: none;"
-        ActionView::Helpers::InstanceTag.new(object, :less_value_for_text_input, self).to_input_field_tag("text", options.merge(:style=>style))
+        html = ActionView::Helpers::InstanceTag.new(object, :less_value_for_text_input, self).to_input_field_tag("text")
+        unobtrusive = options.delete :unobtrusive
+        html += javascript_tag("e = document.getElementById('#{object}_less_value_for_text_input'); e.parentNode.removeChild(e);") unless unobtrusive
+        html
       end
     end
   end
