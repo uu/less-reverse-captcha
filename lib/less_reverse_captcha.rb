@@ -31,7 +31,6 @@ module Less
               record.errors.add('you', configuration[:message]) unless record.send(:less_value_for_text_input).blank?
             end
           else
-            puts 'hello'
             class_eval do
               def validate_captcha
                 less_value_for_text_input.blank?
