@@ -1,6 +1,6 @@
 module Less
   module ReverseCaptcha
-
+    
     module Validations
       def self.append_features(base)
         super
@@ -22,12 +22,21 @@ module Less
         def validates_less_reverse_captcha(options = {})
           attr_accessor :less_value_for_text_input
 
-          configuration = { :message => ' can not create this because you are the sux.', :on => :create }
+          if defined?(ActiveRecord) && self <= ActiveRecord::Base
+            configuration = { :message => ' can not create this because you are the sux.', :on => :create }
 
-          configuration.merge(options)
+            configuration.merge(options)
 
-          validates_each(:less_value_for_text_input, configuration) do |record, attr_name, value|
-            record.errors.add('you', configuration[:message]) unless record.send(:less_value_for_text_input).blank?
+            validates_each(:less_value_for_text_input, configuration) do |record, attr_name, value|
+              record.errors.add('you', configuration[:message]) unless record.send(:less_value_for_text_input).blank?
+            end
+          else
+            puts 'hello'
+            class_eval do
+              def validate_captcha
+                less_value_for_text_input.blank?
+              end
+            end
           end
         end
       end
